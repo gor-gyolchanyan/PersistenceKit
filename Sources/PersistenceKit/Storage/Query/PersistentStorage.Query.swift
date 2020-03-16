@@ -41,7 +41,7 @@ extension PersistentStorage {
         let _aggregateType: Aggregate.Type
         let _publisher: Combine.PassthroughSubject<Output, Failure>
         var _ordering: [Aggregate?]
-        var _mapping: [Aggregate.ID: Index]
+        var _mapping: [Aggregate.Schematic.ID: Index]
         var _listeningToken: _ListeningToken?
     }
 }
@@ -73,7 +73,7 @@ extension PersistentStorage.Query {
         }
     }
 
-    public func index(of id: Aggregate.ID) -> Index? {
+    public func index(of id: Aggregate.Schematic.ID) -> Index? {
         _mapping[id]
     }
 
@@ -116,10 +116,12 @@ extension PersistentStorage.Query {
         for index in change.insertions {
             let newObject = query.object(at: index.uintValue)
             let index = index.intValue
-            let newAggregate = Aggregate(_persistentAggregateObject: newObject)
+            let newAggregate = Aggregate(_aggregateObject: newObject)
             _ordering.insert(newAggregate, at: index)
-            if let newAggregate = newAggregate {
-                _mapping.updateValue(index, forKey: newAggregate.id)
+            if Aggregate._hasID {
+                if let newAggregate = newAggregate {
+                    _mapping.updateValue(index, forKey: newAggregate._id)
+                }
             }
             _publisher.send(.init(_index: index, _old: nil, _new: newAggregate))
         }
@@ -127,8 +129,10 @@ extension PersistentStorage.Query {
             let index = index.intValue
             let oldAggregate = _ordering.indices.contains(index) ? _ordering[index] : nil
             _ordering.remove(at: index)
-            if let oldAggregate = oldAggregate {
-                _mapping.removeValue(forKey: oldAggregate.id)
+            if Aggregate._hasID {
+                if let oldAggregate = oldAggregate {
+                    _mapping.removeValue(forKey: oldAggregate._id)
+                }
             }
             _publisher.send(.init(_index: index, _old: oldAggregate, _new: nil))
         }
@@ -136,7 +140,7 @@ extension PersistentStorage.Query {
             let newObject = query.object(at: index.uintValue)
             let index = index.intValue
             let oldAggregate = _ordering.indices.contains(index) ? _ordering[index] : nil
-            let newAggregate = Aggregate(_persistentAggregateObject: newObject)
+            let newAggregate = Aggregate(_aggregateObject: newObject)
             _ordering[index] = newAggregate
             _publisher.send(.init(_index: index, _old: oldAggregate, _new: newAggregate))
         }
@@ -146,13 +150,15 @@ extension PersistentStorage.Query {
         _ordering.removeAll(keepingCapacity: true)
         for index in 0 ..< query.count {
             let newObject = query.object(at: index)
-            let newAggregate = Aggregate(_persistentAggregateObject: newObject)
+            let newAggregate = Aggregate(_aggregateObject: newObject)
             _ordering.append(newAggregate)
             let index = _ordering.index(before: _ordering.endIndex)
-            if let newAggregate = newAggregate {
-                _mapping.updateValue(index, forKey: newAggregate.id)
+            if Aggregate._hasID {
+                if let newAggregate = newAggregate {
+                    _mapping.updateValue(index, forKey: newAggregate._id)
+                }
             }
-            // _publisher.send(.init(_index: index, _old: nil, _new: newAggregate))
+            _publisher.send(.init(_index: index, _old: nil, _new: newAggregate))
         }
     }
 }

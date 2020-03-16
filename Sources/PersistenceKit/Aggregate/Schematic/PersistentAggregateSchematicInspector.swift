@@ -15,18 +15,11 @@ public protocol PersistentAggregateSchematicInspector {
 
     associatedtype Report
 
-    mutating func inspect<Primitive>(_ primitiveKeyPath: KeyPath<Aggregate, Primitive>, named primitiveName: String)
-    where Primitive: PersistentPrimitive
+    mutating func inspect<Member>(_ memberKeyPath: KeyPath<Aggregate, Member>, named memberName: String)
+    where Member: PersistentPrimitive
+
+    mutating func inspect<Member>(_ memberKeyPath: KeyPath<Aggregate, Member>, named memberName: String)
+    where Member: PersistentAggregate
 
     mutating func report() -> Report
-}
-
-// Topic: Default
-
-extension PersistentAggregateSchematicInspector {
-
-    // Exposed
-
-    public func inspect<Primitive>(_ primitiveKeyPath: KeyPath<Aggregate, Primitive>, named primitiveName: String)
-    where Primitive: PersistentPrimitive { }
 }

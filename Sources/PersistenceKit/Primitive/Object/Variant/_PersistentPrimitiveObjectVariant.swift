@@ -3,6 +3,8 @@
 // Licensing information can be found in the `LICENSE` file located in the root directory of this repository.
 //
 
+import ObjectiveC
+
 // Type: _PersistentPrimitiveObjectVariant
 
 enum _PersistentPrimitiveObjectVariant {
@@ -24,6 +26,8 @@ enum _PersistentPrimitiveObjectVariant {
     case _string
 
     case _data
+
+    case _object(_PersistentAggregateObject.Type)
 }
 
 // Topic: Main
@@ -34,7 +38,7 @@ extension _PersistentPrimitiveObjectVariant {
 
     var _canBePrimaryKey: Bool {
         switch self {
-            case ._bool, ._float32, ._float64, ._date, ._data:
+            case ._bool, ._float32, ._float64, ._date, ._data, ._object:
                 return false
             case ._int, ._string:
                 return true
@@ -45,7 +49,7 @@ extension _PersistentPrimitiveObjectVariant {
         switch self {
             case ._bool, ._int, ._date, ._string:
                 return true
-            case ._float32, ._float64, ._data:
+            case ._float32, ._float64, ._data, ._object:
                 return false
         }
     }
@@ -67,6 +71,8 @@ extension _PersistentPrimitiveObjectVariant {
                 rawCode = "NSString"
             case ._data:
                 rawCode = "NSData"
+            case ._object(let aggregateObjectType):
+                rawCode = String(cString: class_getName(aggregateObjectType))
         }
         return "@\"\(rawCode)\""
     }

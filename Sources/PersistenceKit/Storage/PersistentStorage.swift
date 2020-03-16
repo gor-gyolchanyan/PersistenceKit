@@ -54,13 +54,13 @@ extension PersistentStorage {
         }
     }
 
-    public func load<Aggregate>(_ aggregateType: Aggregate.Type, for id: Aggregate.ID) -> Aggregate?
+    public func load<Aggregate>(_ aggregateType: Aggregate.Type, for id: Aggregate.Schematic.ID) -> Aggregate?
     where Aggregate: PersistentAggregate {
         interactive {
             guard let aggregateObject = aggregateType._aggregateObjectType.object(in: _object, forPrimaryKey: id._primitiveObject) else {
                 return nil
             }
-            return aggregateType.init(_persistentAggregateObject: aggregateObject)
+            return aggregateType.init(_aggregateObject: aggregateObject)
         }
     }
 
@@ -74,7 +74,7 @@ extension PersistentStorage {
 
             return .init(_storage: self, _aggregateType: aggregateType, _queryObject: queryObject)
         }
-      }
+    }
 
     public func query<Aggregate, Predicate>(_ aggregateType: Aggregate.Type, where predicate: Predicate) -> Query<Aggregate>
     where Predicate: PersistentPredicate {
@@ -92,11 +92,15 @@ extension PersistentStorage {
     public func save<Aggregate>(_ aggregate: Aggregate)
     where Aggregate: PersistentAggregate {
         interactive {
-            _object.addOrUpdate(aggregate._persistentAggregateObject)
+            if Aggregate._hasID {
+                _object.addOrUpdate(aggregate._aggregateObject)
+            } else {
+                _object.add(aggregate._aggregateObject)
+            }
         }
     }
 
-    public func clear<Aggregate>(_ aggregateType: Aggregate.Type, for id: Aggregate.ID)
+    public func clear<Aggregate>(_ aggregateType: Aggregate.Type, for id: Aggregate.Schematic.ID)
     where Aggregate: PersistentAggregate {
         interactive {
             guard

@@ -16,15 +16,15 @@ struct _PersistentAggregateObjectVariant {
 
     init(_aggregateName: String) {
         self._aggregateName = _aggregateName
-        _identifierPrimitiveName = nil
-        _primitiveObjectVariantMapping = .init()
+        _idName = nil
+        _objectVariantMapping = .init()
     }
 
     var _aggregateName: String
 
-    var _identifierPrimitiveName: String?
+    var _idName: String?
 
-    var _primitiveObjectVariantMapping: [String: _PersistentPrimitiveObjectVariant]
+    var _objectVariantMapping: [String: _PersistentPrimitiveObjectVariant]
 }
 
 // Topic: Main
@@ -55,7 +55,7 @@ extension _PersistentAggregateObjectVariant {
             preconditionFailure()
         }
 
-        for (propertyName, propertyType) in _primitiveObjectVariantMapping {
+        for (propertyName, propertyType) in _objectVariantMapping {
             guard
                 Self._generateProperty(named: propertyName, typed: propertyType, in: nativeType)
             else {
@@ -64,7 +64,7 @@ extension _PersistentAggregateObjectVariant {
         }
 
         guard
-            Self._generatePrimaryKeyRepresenter(primaryKey: _identifierPrimitiveName, modelClass: nativeType)
+            Self._generatePrimaryKeyRepresenter(primaryKey: _idName, modelClass: nativeType)
         else {
             preconditionFailure()
         }

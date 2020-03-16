@@ -14,15 +14,15 @@ extension _PersistentAggregateObjectVariant {
 
         // Exposed
 
-        init(_aggregateName: String, _identifierKeyPath: KeyPath<Aggregate, Aggregate.ID>?) {
-            self._identifierKeyPath = _identifierKeyPath
+        init(_aggregateName: String, _idKeyPath: KeyPath<Aggregate, Aggregate.Schematic.ID>) {
+            self._idKeyPath = _idKeyPath
             _nameMapping = .init()
             _report = .init(_aggregateName: _aggregateName)
         }
 
         // Concealed
 
-        private let _identifierKeyPath: KeyPath<Aggregate, Aggregate.ID>?
+        private let _idKeyPath: KeyPath<Aggregate, Aggregate.Schematic.ID>
         private var _nameMapping: [PartialKeyPath<Aggregate>: String]
         private var _report: Report
     }
@@ -36,14 +36,20 @@ extension _PersistentAggregateObjectVariant._SchematicInspector: PersistentAggre
 
     typealias Report = _PersistentAggregateObjectVariant
 
-    mutating func inspect<Primitive>(_ primitiveKeyPath: KeyPath<Aggregate, Primitive>, named primitiveName: String)
-    where Primitive: PersistentPrimitive {
-        _nameMapping[primitiveKeyPath] = primitiveName
-        _report._primitiveObjectVariantMapping[primitiveName] = Primitive._primitiveObjectVariant
+    mutating func inspect<Member>(_ memberKeyPath: KeyPath<Aggregate, Member>, named memberName: String)
+    where Member: PersistentPrimitive {
+        _nameMapping[memberKeyPath] = memberName
+        _report._objectVariantMapping[memberName] = Member._primitiveObjectVariant
     }
-    
+
+    mutating func inspect<Member>(_ memberKeyPath: KeyPath<Aggregate, Member>, named memberName: String)
+    where Member: PersistentAggregate {
+        _nameMapping[memberKeyPath] = memberName
+        _report._objectVariantMapping[memberName] = Member._primitiveObjectVariant
+    }
+
     mutating func report() -> Report {
-        _report._identifierPrimitiveName = _identifierKeyPath.map { _nameMapping[$0] } ?? nil
+        _report._idName = Aggregate._hasID ? _nameMapping[_idKeyPath] :  nil
         return _report
     }
 }

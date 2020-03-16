@@ -3,8 +3,9 @@
 // Licensing information can be found in the `LICENSE` file located in the root directory of this repository.
 //
 
-import class Foundation.NSObject
+import Foundation
+import PersistenceKit
 
-// Type: _PersistentPrimitiveObject
+// There is a bug which causes nested `KeyPath`s inside `PersistenPredicate`s to fail.
 
-typealias _PersistentPrimitiveObject = Foundation.NSObject
+RunLoop.main.run() // This is necessary for query updates to be delivered.

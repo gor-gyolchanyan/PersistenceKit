@@ -36,13 +36,19 @@ extension KeyPath._SchematicInspector: PersistentAggregateSchematicInspector {
 
     typealias Report = String
 
-    mutating func inspect<Primitive>(_ primitiveKeyPath: KeyPath<Aggregate, Primitive>, named primitiveName: String)
-    where Primitive: PersistentPrimitive {
-        if primitiveKeyPath == _keyPath {
-            _report = primitiveName
+    mutating func inspect<Member>(_ memberKeyPath: KeyPath<Aggregate, Member>, named memberName: String)
+    where Member: PersistentPrimitive {
+        if memberKeyPath == _keyPath {
+            _report = memberName
         }
     }
 
+    mutating func inspect<Member>(_ memberKeyPath: KeyPath<Aggregate, Member>, named memberName: String)
+    where Member: PersistentAggregate {
+        if memberKeyPath == _keyPath {
+            _report = memberName
+        }
+    }
     mutating func report() -> Report {
         _report
     }

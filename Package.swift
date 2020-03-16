@@ -11,6 +11,10 @@ let package = Package(
         .watchOS(.v6)
     ],
     products: [
+        .executable(
+            name: "PersistenceKitSample1",
+            targets: ["PersistenceKitSample1"]
+        ),
         .library(
             name: "PersistenceKit",
             targets: ["PersistenceKit"]
@@ -23,6 +27,12 @@ let package = Package(
         )
     ],
     targets: [
+        .target(
+            name: "PersistenceKitSample1",
+            dependencies: [
+                "PersistenceKit"
+            ]
+        ),
         .target(
             name: "PersistenceKit",
             dependencies: [
