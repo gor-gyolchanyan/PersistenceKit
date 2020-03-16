@@ -1,0 +1,7 @@
+# To check in files in any directory named `Icon`. This compensates for a bug in the `macos` section.
+# {
+!Icon
+# }
+
+# To avoid checking in binary frameworks.
+/Frameworks
