@@ -21,5 +21,9 @@ public protocol PersistentAggregateSchematicInspector {
     mutating func inspect<Member>(_ memberKeyPath: KeyPath<Aggregate, Member>, named memberName: String)
     where Member: PersistentAggregate
 
+    // TODO: Replace this with proper Optional support.
+    mutating func inspect<Member>(_ memberKeyPath: KeyPath<Aggregate, Member?>, named memberName: String)
+    where Member: PersistentAggregate
+    
     mutating func report() -> Report
 }

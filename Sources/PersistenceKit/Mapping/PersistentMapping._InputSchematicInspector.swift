@@ -60,6 +60,17 @@ extension PersistentMapping._InputSchematicInspector: PersistentAggregateSchemat
         _report._nameMapping[memberKeyPath] = memberName
     }
 
+    mutating func inspect<Member>(_ memberKeyPath: KeyPath<Aggregate, Member?>, named memberName: String)
+    where Member: PersistentAggregate {
+        // TODO: Replace literal selector with something better.
+        let selector = Selector("_get_\(memberName)")
+        guard let primitiveObject = _aggregateObject.perform(selector)?.takeUnretainedValue() as? _PersistentPrimitiveObject else {
+            return
+        }
+        _report._objectMapping[memberName] = primitiveObject
+        _report._nameMapping[memberKeyPath] = memberName
+    }
+
     func report() -> Report {
         _report
     }

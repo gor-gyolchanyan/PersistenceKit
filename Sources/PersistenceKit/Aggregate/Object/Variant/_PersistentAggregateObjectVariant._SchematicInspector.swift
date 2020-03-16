@@ -48,6 +48,12 @@ extension _PersistentAggregateObjectVariant._SchematicInspector: PersistentAggre
         _report._objectVariantMapping[memberName] = Member._primitiveObjectVariant
     }
 
+    mutating func inspect<Member>(_ memberKeyPath: KeyPath<Aggregate, Member?>, named memberName: String)
+    where Member: PersistentAggregate {
+        _nameMapping[memberKeyPath] = memberName
+        _report._objectVariantMapping[memberName] = Member._primitiveObjectVariant
+    }
+
     mutating func report() -> Report {
         _report._idName = Aggregate._hasID ? _nameMapping[_idKeyPath] :  nil
         return _report

@@ -3,6 +3,8 @@
 // Licensing information can be found in the `LICENSE` file located in the root directory of this repository.
 //
 
+import class Foundation.NSNull
+
 // Type: PersistentMapping._OutputSchematicInspector
 
 extension PersistentMapping {
@@ -43,6 +45,12 @@ extension PersistentMapping._OutputSchematicInspector: PersistentAggregateSchema
     mutating func inspect<Member>(_ memberKeyPath: KeyPath<Aggregate, Member>, named memberName: String)
     where Member: PersistentAggregate {
         _report._objectMapping[memberName] = _aggregate[keyPath: memberKeyPath]._primitiveObject
+        _report._nameMapping[memberKeyPath] = memberName
+    }
+
+    mutating func inspect<Member>(_ memberKeyPath: KeyPath<Aggregate, Member?>, named memberName: String)
+    where Member: PersistentAggregate {
+        _report._objectMapping[memberName] = _aggregate[keyPath: memberKeyPath]?._primitiveObject ?? NSNull()
         _report._nameMapping[memberKeyPath] = memberName
     }
 

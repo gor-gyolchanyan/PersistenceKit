@@ -38,7 +38,7 @@ extension PersistentAggregate {
     }
 
     static var _hasID: Bool {
-        Schematic.ID.self != Never.self
+        !(Schematic.ID.self == Never.self || Schematic.ID.self == Never?.self)
     }
 
     init?(_aggregateObject: _PersistentAggregateObject) {
